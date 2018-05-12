@@ -20,7 +20,12 @@ User = Query()
 def new_user():
     username = request.json.get('username')
     interest = request.json.get('interest')
-    db.insert({'username' : username, 'interest' : interest})
+    splitint = interest.split(',')
+    lenspl = len(splitint)
+    newdict = dict()
+    for lens in range(lenspl):
+        newdict.update({lens : splitint[lens]})
+    db.insert({'username' : username, 'interest' : newdict})
 
     return (jsonify({'username': username, 'interest' : interest}), 201)
 
