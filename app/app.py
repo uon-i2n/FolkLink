@@ -7,8 +7,9 @@ from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
+import requests
 import json
-
+import random
 from tinydb import TinyDB, Query
 # initialization
 app = Flask(__name__)
@@ -24,10 +25,15 @@ def new_user():
     lenspl = len(splitint)
     newdict = dict()
     for lens in range(lenspl):
-        newdict.update({lens : splitint[lens]})
+        reqgif = requests.get('https://api.giphy.com/v1/gifs/search?api_key=ee58ff1d10c54fd29ddb0388126c2bcd&q={}&limit=25&offset=0&rating=G&lang=en'.format(splitint[lens]))
+        gifjs = (reqgif.json())
+        randch = random.choice(gifjs['data'])
+        newdict.update({lens : dict({'name' : splitint[lens], 'gif' : randch['images']['fixed_width']['url']})})
+
+
     db.insert({'username' : username, 'interest' : newdict})
 
-    return (jsonify({'username': username, 'interest' : interest}), 201)
+    #return (jsonify({'username': username, 'interest' : dict({'name' :interest, 'gif': })}), 201)
 
 
 @app.route('/all')
